@@ -1,4 +1,6 @@
 #include <iostream>
+#include <queue>
+#include <vector>
 using namespace std;
 class Node
 {
@@ -6,6 +8,7 @@ public:
     int data;
     Node *left;
     Node *right;
+
     Node(int val)
     {
         this->data = val;
@@ -13,136 +16,88 @@ public:
         this->right = NULL;
     }
 };
-// it returns root node of created tree
-Node *CreateTree()
+Node *createTree()
 {
-    cout << "Enter the value->";
-    int val;
-    cin >> val;
-    // when ever no node is left enter -1
-    if (val == -1)
-    {
-        return NULL; // base case
-    }
-    // Create new node
-    Node *newNode = new Node(val);
-    // left sub tree
-    cout << "left of" << newNode->data << endl;
-    newNode->left = CreateTree();
-    // right sub tree
-    cout << "right of" << newNode->data << endl;
-    newNode->right = CreateTree();
-    return newNode;
-}
-void Search(Node *root, int val)
-{
+    cout << "Enter Data=> ";
+    int data;
+    cin >> data;
 
-    while (root != NULL)
+    Node *newNode = new Node(data);
+    // Base case
+    if (newNode->data == -1)
     {
-        if (root->data == val)
-        {
-            cout << "found->" << root->data << endl;
-            return;
-        }
-        else if (root->data > val)
-            root = root->left;
-        if (root->data < val)
-            root = root->right;
+        return NULL;
     }
+    // for the left Node;
+    newNode->left = createTree();
+    // for the right Node;
+    newNode->right = createTree();
 }
-Node *inOrderPredecessor(struct Node *root)
+void inorder(Node *root)
 {
-    root = root->left;
-    while (root->right != NULL)
-    {
-        root = root->right;
-    }
-    return root;
-}
-Node *deletion(Node *root, int val)
-{
-
-    // case1 the node is root node
-    // case2 the node is leaf node
-    // case3 the node is non leaf node
-    Node *iPre;
     if (root == NULL)
     {
-        return NULL;
+        return;
     }
-    if (root->left == NULL && root->right == NULL)
-    {
-        free(root);
-        return NULL;
-    }
-
-    // searching for the node to be deleted
-    if (val < root->data)
-    {
-        root->left = deletion(root->left, val);
-    }
-    else if (val > root->data)
-    {
-        root->right = deletion(root->right, val);
-    }
-    // deletion strategy when the node is found
-    else
-    {
-        iPre = inOrderPredecessor(root);
-        root->data = iPre->data;
-        root->left = deletion(root->left, iPre->data);
-    }
-    return root;
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
 }
-void Insertion(Node *root, int val)
+void preorder(Node *root)
 {
-    Node *prev = NULL;
-    while (root != NULL)
+    if (root == NULL)
     {
-        prev = root;
-
-        if (root->data == val)
+        return;
+    }
+    cout << root->data << " ";
+    inorder(root->left);
+    inorder(root->right);
+}
+void postorder(Node *root)
+{
+    if (root == NULL)
+    {
+        return;
+    }
+    inorder(root->left);
+    inorder(root->right);
+    cout << root->data << " ";
+}
+void levelOrder(Node *root)
+{
+    queue<Node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        Node *front = q.front();
+        q.pop();
+        if (front == NULL)
         {
-            cout << "already present";
-            return;
+            cout << endl;
+            q.push(NULL);
         }
-        else if (root->data > val)
-            root = root->left;
-        if (root->data < val)
-            root = root->right;
-    }
-    Node *newNode = new Node(val);
-    if (val < prev->data)
-    {
-        prev->left = newNode;
-    }
-    else
-    {
-        prev->right = newNode;
-    }
-}
-void inorder(Node *p)
-{
-    if (p != NULL)
-    {
-        inorder(p->left);
-        cout << p->data << "->";
-        inorder(p->right);
+        else
+        {
+
+            cout << front->data << " ";
+            if (front->left != NULL)
+            {
+                q.push(front->left);
+            }
+            if (front->right != NULL)
+            {
+                q.push(front->right);
+            }
+        }
     }
 }
 
 int main()
-
 {
-    int x = 1;
-    int val;
 
-    Node *root = CreateTree();
-    while (x < 5)
-    {
-        cin >> val;
-        deletion(root, val);
-        inorder(root);
-        x++;
-    }
+    Node *root = createTree();
+    // inorder(root);
+    // preorder(root);
+    // postorder(root);
+    levelOrder(root);
 }
